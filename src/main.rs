@@ -6,15 +6,15 @@ struct TimeTracker {
 }
 
 impl TimeTracker {
-    fn new() -> TimeTracker {
-        TimeTracker {
-            working_time: 0
+    fn new() -> Self {
+        Self {
+            working_time: 0,
         }
     }
 }
 
 impl App for TimeTracker {
-    fn update(&mut self, ctx: &Context, frame: &mut Frame) {
+    fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui| {
             let minutes = (&self.working_time / 60) % 60;
             let hours = (&self.working_time / 60) / 60;
@@ -27,7 +27,6 @@ impl App for TimeTracker {
 
 fn main() {
     let app = TimeTracker::new();
-
     let window_options = NativeOptions {
         always_on_top: false,
         maximized: false,
@@ -56,6 +55,7 @@ fn main() {
         centered: false,
     };
 
-    run_native("TimeTracker", window_options, Box::new(|cc| Box::new(app)))
-        .expect("TODO: panic message");
+    run_native("TimeTracker", window_options, Box::new(|_cc| {
+        Box::new(app)
+    })).expect("TODO: panic message");
 }
