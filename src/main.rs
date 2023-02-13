@@ -1,5 +1,5 @@
 use eframe::{App, Frame, HardwareAcceleration, NativeOptions, Renderer, run_native, Theme};
-use eframe::egui::{CentralPanel, Context, Vec2};
+use eframe::egui::{CentralPanel, Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 
 struct TimeTracker {
     working_time: u32
@@ -25,9 +25,21 @@ impl App for TimeTracker {
     }
 }
 
-fn main() {
-    let app = TimeTracker::new();
-    let window_options = NativeOptions {
+fn main() -> Result<(), eframe::Error> {
+    let window_options = setup_custom_options();
+
+    run_native(
+        "TimeTracker",
+        window_options,
+        Box::new(|cc| {
+            setup_custom_fonts(&cc.egui_ctx);
+            Box::new(TimeTracker::new())
+        })
+    )
+}
+
+fn setup_custom_options() -> NativeOptions {
+    NativeOptions {
         always_on_top: false,
         maximized: false,
         decorated: true,
@@ -53,9 +65,41 @@ fn main() {
         event_loop_builder: None,
         shader_version: None,
         centered: false,
-    };
+    }
+}
 
-    run_native("TimeTracker", window_options, Box::new(|_cc| {
-        Box::new(app)
-    })).expect("TODO: panic message");
+fn setup_custom_fonts(ctx: &Context) {
+    let mut font_def = FontDefinitions::default();
+
+    font_def.font_data.insert(
+        "Lato".to_owned(),
+        FontData::from_static(include_bytes!(
+            "../resources/fonts/Lato-Regular.ttf"
+        )),
+    );
+
+    let mut style = (*ctx.style()).clone();
+    style.text_styles = [
+        (TextStyle::Heading, FontId::new(30.0, FontFamily::Proportional)),
+        (TextStyle::Body, FontId::new(18.0, FontFamily::Proportional)),
+        (TextStyle::Monospace, FontId::new(14.0, FontFamily::Proportional)),
+        (TextStyle::Button, FontId::new(14.0, FontFamily::Proportional)),
+        (TextStyle::Small, FontId::new(10.0, FontFamily::Proportional)),
+    ].into();
+    ctx.set_style(style);
+
+    // Put my font first (highest priority) for proportional text
+    font_def
+        .families
+        .entry(FontFamily::Proportional)
+        .or_default()
+        .insert(0, "Lato".to_owned());
+    // Put my font as last fallback for monospace
+    font_def
+        .families
+        .entry(FontFamily::Monospace)
+        .or_default()
+        .push("Lato".to_owned());
+
+    ctx.set_fonts(font_def);
 }
