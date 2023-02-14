@@ -1,4 +1,5 @@
 mod time_tracker;
+mod widget;
 
 use crate::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
