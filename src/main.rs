@@ -1,33 +1,8 @@
-use eframe::{App, Frame, IconData, NativeOptions, run_native};
-use eframe::egui::{CentralPanel, Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Ui, Vec2};
+mod time_tracker;
 
-struct TimeTracker {
-    working_time: u32
-}
-
-impl TimeTracker {
-    fn new() -> Self {
-        Self {
-            working_time: 45367,
-        }
-    }
-
-    fn render_times(&self, ui: &mut Ui) {
-        let minutes = (&self.working_time / 60) % 60;
-        let hours = (&self.working_time / 60) / 60;
-
-        ui.label(format!("{:0>2}:{:0>2}", hours, minutes));
-        ui.label("Working Time");
-    }
-}
-
-impl App for TimeTracker {
-    fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
-        CentralPanel::default().show(ctx, |ui| {
-            self.render_times(ui);
-        });
-    }
-}
+use crate::time_tracker::TimeTracker;
+use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Ui, Vec2};
+use eframe::{run_native, IconData, NativeOptions};
 
 fn main() -> Result<(), eframe::Error> {
     let window_options = setup_custom_options();
@@ -38,7 +13,7 @@ fn main() -> Result<(), eframe::Error> {
         Box::new(|cc| {
             setup_custom_fonts(&cc.egui_ctx);
             Box::new(TimeTracker::new())
-        })
+        }),
     )
 }
 
@@ -56,19 +31,30 @@ fn setup_custom_fonts(ctx: &Context) {
 
     font_def.font_data.insert(
         "Lato".to_owned(),
-        FontData::from_static(include_bytes!(
-            "../resources/fonts/Lato-Regular.ttf"
-        )),
+        FontData::from_static(include_bytes!("../resources/fonts/Lato-Regular.ttf")),
     );
 
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
-        (TextStyle::Heading, FontId::new(30.0, FontFamily::Proportional)),
+        (
+            TextStyle::Heading,
+            FontId::new(30.0, FontFamily::Proportional),
+        ),
         (TextStyle::Body, FontId::new(18.0, FontFamily::Proportional)),
-        (TextStyle::Monospace, FontId::new(14.0, FontFamily::Proportional)),
-        (TextStyle::Button, FontId::new(14.0, FontFamily::Proportional)),
-        (TextStyle::Small, FontId::new(10.0, FontFamily::Proportional)),
-    ].into();
+        (
+            TextStyle::Monospace,
+            FontId::new(14.0, FontFamily::Proportional),
+        ),
+        (
+            TextStyle::Button,
+            FontId::new(14.0, FontFamily::Proportional),
+        ),
+        (
+            TextStyle::Small,
+            FontId::new(10.0, FontFamily::Proportional),
+        ),
+    ]
+    .into();
     ctx.set_style(style);
 
     // Put my font first (highest priority) for proportional text
