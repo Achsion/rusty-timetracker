@@ -1,7 +1,7 @@
 mod time_tracker;
 
 use crate::time_tracker::TimeTracker;
-use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Ui, Vec2};
+use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
 
 fn main() -> Result<(), eframe::Error> {
