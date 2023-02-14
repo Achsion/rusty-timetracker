@@ -1,5 +1,5 @@
-use eframe::{App, Frame, HardwareAcceleration, NativeOptions, Renderer, run_native, Theme};
-use eframe::egui::{CentralPanel, Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
+use eframe::{App, Frame, IconData, NativeOptions, run_native};
+use eframe::egui::{CentralPanel, Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Ui, Vec2};
 
 struct TimeTracker {
     working_time: u32
@@ -8,19 +8,23 @@ struct TimeTracker {
 impl TimeTracker {
     fn new() -> Self {
         Self {
-            working_time: 0,
+            working_time: 45367,
         }
+    }
+
+    fn render_times(&self, ui: &mut Ui) {
+        let minutes = (&self.working_time / 60) % 60;
+        let hours = (&self.working_time / 60) / 60;
+
+        ui.label(format!("{:0>2}:{:0>2}", hours, minutes));
+        ui.label("Working Time");
     }
 }
 
 impl App for TimeTracker {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         CentralPanel::default().show(ctx, |ui| {
-            let minutes = (&self.working_time / 60) % 60;
-            let hours = (&self.working_time / 60) / 60;
-
-            ui.label(format!("{:0>2}:{:0>2}", hours, minutes));
-            ui.label("Working Time");
+            self.render_times(ui);
         });
     }
 }
@@ -40,31 +44,10 @@ fn main() -> Result<(), eframe::Error> {
 
 fn setup_custom_options() -> NativeOptions {
     NativeOptions {
-        always_on_top: false,
-        maximized: false,
-        decorated: true,
-        fullscreen: false,
-        drag_and_drop_support: true,
-        icon_data: None,
-        initial_window_pos: None,
+        icon_data: Some(load_icon()),
         initial_window_size: Some(Vec2::new(300., 400.)),
-        min_window_size: None,
-        max_window_size: None,
         resizable: false,
-        transparent: false,
-        mouse_passthrough: false,
-        vsync: true,
-        multisampling: 0,
-        depth_buffer: 0,
-        stencil_buffer: 0,
-        hardware_acceleration: HardwareAcceleration::Preferred,
-        renderer: Renderer::default(),
-        follow_system_theme: cfg!(target_os = "macos") || cfg!(target_os = "windows"),
-        default_theme: Theme::Dark,
-        run_and_return: true,
-        event_loop_builder: None,
-        shader_version: None,
-        centered: false,
+        ..Default::default()
     }
 }
 
@@ -102,4 +85,23 @@ fn setup_custom_fonts(ctx: &Context) {
         .push("Lato".to_owned());
 
     ctx.set_fonts(font_def);
+}
+
+fn load_icon() -> IconData {
+    let image_bytes = include_bytes!("../resources/icons/icon.png");
+
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::load_from_memory(image_bytes)
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+
+    IconData {
+        rgba: icon_rgba,
+        width: icon_width,
+        height: icon_height,
+    }
 }
