@@ -1,7 +1,9 @@
-mod time_tracker;
-mod widget;
+mod window {
+    pub mod time_tracker;
+    pub mod widget;
+}
 
-use crate::time_tracker::TimeTracker;
+use crate::window::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
 

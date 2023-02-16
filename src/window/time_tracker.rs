@@ -1,4 +1,4 @@
-use crate::widget::CustomWidget;
+use crate::window::widget::CustomWidget;
 use eframe::egui::{Align, CentralPanel, Context, Layout, Ui};
 use eframe::{App, Frame};
 
