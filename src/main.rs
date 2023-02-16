@@ -8,10 +8,12 @@ mod window {
 
 use crate::data::tracking_week::TrackingWeek;
 use crate::window::time_tracker::TimeTracker;
+use directories::ProjectDirs;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
+use std::env::current_dir;
 use std::error::Error;
-use std::fs::{create_dir, metadata};
+use std::fs::{create_dir_all, metadata};
 use std::{io, process};
 
 fn main() {
@@ -117,11 +119,21 @@ fn load_icon() -> IconData {
 }
 
 fn setup_app_directory() -> Result<String, io::Error> {
-    //TODO: generate path (by os?)
-    let directory_path = format!("{}/{}", env!("CARGO_MANIFEST_DIR"), "tmp");
+    let directory_path = if cfg!(debug_assertions) {
+        let mut working_dir = current_dir()?;
+        working_dir.push("timetracker-tmp");
+        working_dir.to_str().unwrap().to_string()
+    } else {
+        ProjectDirs::from("de", "Achsion", "TimeTracker")
+            .unwrap()
+            .config_dir()
+            .to_str()
+            .unwrap()
+            .to_string()
+    };
 
     if metadata(&directory_path).is_err() {
-        create_dir(&directory_path)?;
+        create_dir_all(&directory_path)?;
     }
 
     Ok(directory_path)
