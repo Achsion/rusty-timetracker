@@ -1,13 +1,24 @@
+mod data {
+    pub mod tracking_week;
+}
 mod window {
     pub mod time_tracker;
     pub mod widget;
 }
 
+use std::process;
 use crate::window::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
+use crate::data::tracking_week::TrackingWeek;
 
 fn main() -> Result<(), eframe::Error> {
+    let test = TrackingWeek::from_file("tmp/test.csv");
+    if let Err(err) = test {
+        println!("{}", err);
+        process::exit(1);
+    }
+
     let window_options = setup_custom_options();
 
     run_native(
