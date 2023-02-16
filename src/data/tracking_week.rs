@@ -1,14 +1,15 @@
 use csv::{Reader, Writer};
 use serde::{Deserialize, Serialize};
 use std::fs::metadata;
+use std::path::PathBuf;
 
 pub struct TrackingWeek {
-    file_path: String,
+    file_path: PathBuf,
     records: Vec<DummyRecord>,
 }
 
 impl TrackingWeek {
-    pub fn from_file(file_path: String) -> Result<Self, csv::Error> {
+    pub fn from_file(file_path: PathBuf) -> Result<Self, csv::Error> {
         if metadata(&file_path).is_err() {
             return Ok(Self {
                 file_path,

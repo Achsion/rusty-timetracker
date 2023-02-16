@@ -14,6 +14,7 @@ use eframe::{run_native, IconData, NativeOptions};
 use std::env::current_dir;
 use std::error::Error;
 use std::fs::{create_dir_all, metadata};
+use std::path::PathBuf;
 use std::{io, process};
 
 fn main() {
@@ -24,9 +25,9 @@ fn main() {
 }
 
 fn setup() -> Result<(), Box<dyn Error>> {
-    let app_directory_path = setup_app_directory()?;
+    let config_dir_path = setup_config_directory()?;
 
-    let read_result = TrackingWeek::from_file(format!("{}/{}", app_directory_path, "test.csv"))?;
+    let read_result = TrackingWeek::from_file(config_dir_path.join("test.csv"))?;
     read_result.save()?;
 
     let window_options = setup_custom_options();
@@ -118,23 +119,21 @@ fn load_icon() -> IconData {
     }
 }
 
-fn setup_app_directory() -> Result<String, io::Error> {
-    let directory_path = if cfg!(debug_assertions) {
+fn setup_config_directory() -> Result<PathBuf, io::Error> {
+    let config_path = if cfg!(debug_assertions) {
         let mut working_dir = current_dir()?;
         working_dir.push("timetracker-tmp");
-        working_dir.to_str().unwrap().to_string()
+        working_dir
     } else {
         ProjectDirs::from("de", "Achsion", "TimeTracker")
             .unwrap()
             .config_dir()
-            .to_str()
-            .unwrap()
-            .to_string()
+            .to_path_buf()
     };
 
-    if metadata(&directory_path).is_err() {
-        create_dir_all(&directory_path)?;
+    if metadata(&config_path).is_err() {
+        create_dir_all(&config_path)?;
     }
 
-    Ok(directory_path)
+    Ok(config_path)
 }
