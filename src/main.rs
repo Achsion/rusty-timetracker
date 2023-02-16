@@ -6,15 +6,21 @@ mod window {
     pub mod widget;
 }
 
-use std::process;
+use crate::data::tracking_week::TrackingWeek;
 use crate::window::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
-use crate::data::tracking_week::TrackingWeek;
+use std::process;
 
 fn main() -> Result<(), eframe::Error> {
-    let test = TrackingWeek::from_file("tmp/test.csv");
-    if let Err(err) = test {
+    //TODO: generate path (by os?)
+    let read_result = TrackingWeek::from_file("tmp/test.csv");
+    if let Err(err) = read_result {
+        println!("{}", err);
+        process::exit(1);
+    }
+    let save_result = read_result.expect("").save();
+    if let Err(err) = save_result {
         println!("{}", err);
         process::exit(1);
     }
