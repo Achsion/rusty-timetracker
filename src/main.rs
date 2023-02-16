@@ -10,20 +10,22 @@ use crate::data::tracking_week::TrackingWeek;
 use crate::window::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
-use std::process;
+use std::error::Error;
+use std::fs::{create_dir, metadata};
+use std::{io, process};
 
-fn main() -> Result<(), eframe::Error> {
-    //TODO: generate path (by os?)
-    let read_result = TrackingWeek::from_file("tmp/test.csv");
-    if let Err(err) = read_result {
+fn main() {
+    if let Err(err) = setup() {
         println!("{}", err);
         process::exit(1);
     }
-    let save_result = read_result.expect("").save();
-    if let Err(err) = save_result {
-        println!("{}", err);
-        process::exit(1);
-    }
+}
+
+fn setup() -> Result<(), Box<dyn Error>> {
+    let app_directory_path = setup_app_directory()?;
+
+    let read_result = TrackingWeek::from_file(format!("{}/{}", app_directory_path, "test.csv"))?;
+    read_result.save()?;
 
     let window_options = setup_custom_options();
 
@@ -34,7 +36,9 @@ fn main() -> Result<(), eframe::Error> {
             setup_custom_fonts(&cc.egui_ctx);
             Box::new(TimeTracker::new())
         }),
-    )
+    )?;
+
+    Ok(())
 }
 
 fn setup_custom_options() -> NativeOptions {
@@ -110,4 +114,15 @@ fn load_icon() -> IconData {
         width: icon_width,
         height: icon_height,
     }
+}
+
+fn setup_app_directory() -> Result<String, io::Error> {
+    //TODO: generate path (by os?)
+    let directory_path = format!("{}/{}", env!("CARGO_MANIFEST_DIR"), "tmp");
+
+    if metadata(&directory_path).is_err() {
+        create_dir(&directory_path)?;
+    }
+
+    Ok(directory_path)
 }

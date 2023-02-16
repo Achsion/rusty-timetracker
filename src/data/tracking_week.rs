@@ -1,5 +1,6 @@
 use csv::{Reader, Writer};
 use serde::{Deserialize, Serialize};
+use std::fs::metadata;
 
 pub struct TrackingWeek {
     file_path: String,
@@ -7,10 +8,15 @@ pub struct TrackingWeek {
 }
 
 impl TrackingWeek {
-    pub fn from_file(file: &str) -> Result<Self, csv::Error> {
-        //TODO: get full path from attribute
-        let file_path = format!("{}/{}", env!("CARGO_MANIFEST_DIR"), file);
-        let mut reader = Reader::from_path(file_path.clone())?;
+    pub fn from_file(file_path: String) -> Result<Self, csv::Error> {
+        if metadata(&file_path).is_err() {
+            return Ok(Self {
+                file_path,
+                records: Vec::new(),
+            });
+        }
+
+        let mut reader = Reader::from_path(&file_path)?;
 
         Ok(Self {
             file_path,
