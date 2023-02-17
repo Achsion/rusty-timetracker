@@ -27,8 +27,18 @@ impl TrackingDay {
         })
     }
 
-    pub fn save_records(&self) -> Result<(), csv::Error> {
+    pub fn save_records(&mut self) -> Result<(), csv::Error> {
         let mut writer = Writer::from_path(&self.file_path)?;
+
+        // // Ensure at least one record is written to prevent an empty .csv file with only headers
+        // // -> this could otherwise cause the creation of multiple header rows
+        // if self.records.is_empty() {
+        //     self.records.push(LogRecord {
+        //         log_type: LogType::Unknown,
+        //         time: Local::now(),
+        //         add_seconds: None,
+        //     });
+        // }
 
         for record in &self.records {
             writer.serialize(record)?;
@@ -42,7 +52,7 @@ impl TrackingDay {
         self.records
             .sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
 
-        let mut last_log_type = LogType::BreakAdd;
+        let mut last_log_type = LogType::Unknown;
         let mut new_records: Vec<LogRecord> = Vec::new();
         for record in &self.records {
             if record.log_type == LogType::BreakAdd || last_log_type != record.log_type {
@@ -56,7 +66,7 @@ impl TrackingDay {
 
     pub fn append_save_record(&mut self, log_record: LogRecord) -> Result<(), Box<dyn Error>> {
         let should_write_headers = self.records.is_empty();
-        self.records.push(log_record);
+        self.append_record(log_record);
 
         let file_writer = OpenOptions::new()
             .write(true)
@@ -71,6 +81,10 @@ impl TrackingDay {
         writer.flush()?;
 
         Ok(())
+    }
+
+    pub fn append_record(&mut self, log_record: LogRecord) {
+        self.records.push(log_record);
     }
 }
 
@@ -87,4 +101,5 @@ pub enum LogType {
     Work,
     BreakStart,
     BreakAdd,
+    Unknown,
 }
