@@ -30,16 +30,6 @@ impl TrackingDay {
     pub fn save_records(&mut self) -> Result<(), csv::Error> {
         let mut writer = Writer::from_path(&self.file_path)?;
 
-        // // Ensure at least one record is written to prevent an empty .csv file with only headers
-        // // -> this could otherwise cause the creation of multiple header rows
-        // if self.records.is_empty() {
-        //     self.records.push(LogRecord {
-        //         log_type: LogType::Unknown,
-        //         time: Local::now(),
-        //         add_seconds: None,
-        //     });
-        // }
-
         for record in &self.records {
             writer.serialize(record)?;
         }
