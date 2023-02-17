@@ -1,7 +1,8 @@
 use chrono::{DateTime, Local};
-use csv::{Reader, Writer};
+use csv::{Reader, Writer, WriterBuilder};
 use serde::{Deserialize, Serialize};
-use std::fs::metadata;
+use std::error::Error;
+use std::fs::{metadata, OpenOptions};
 use std::path::PathBuf;
 
 pub struct TrackingDay {
@@ -26,8 +27,8 @@ impl TrackingDay {
         })
     }
 
-    pub fn save(&self) -> Result<(), csv::Error> {
-        let mut writer = Writer::from_path(self.file_path.clone())?;
+    pub fn save_records(&self) -> Result<(), csv::Error> {
+        let mut writer = Writer::from_path(&self.file_path)?;
 
         for record in &self.records {
             writer.serialize(record)?;
@@ -38,7 +39,8 @@ impl TrackingDay {
     }
 
     pub fn clean_records(&mut self) {
-        self.records.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
+        self.records
+            .sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
 
         let mut last_log_type = LogType::BreakAdd;
         let mut new_records: Vec<LogRecord> = Vec::new();
@@ -51,19 +53,38 @@ impl TrackingDay {
 
         self.records = new_records;
     }
+
+    pub fn append_save_record(&mut self, log_record: LogRecord) -> Result<(), Box<dyn Error>> {
+        let should_write_headers = self.records.is_empty();
+        self.records.push(log_record);
+
+        let file_writer = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .append(true)
+            .open(&self.file_path)?;
+
+        let mut writer = WriterBuilder::new()
+            .has_headers(should_write_headers)
+            .from_writer(file_writer);
+        writer.serialize(log_record)?;
+        writer.flush()?;
+
+        Ok(())
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct LogRecord {
-    time: DateTime<Local>,
-    log_type: LogType,
-    add_seconds: Option<i64>,
+pub struct LogRecord {
+    pub time: DateTime<Local>,
+    pub log_type: LogType,
+    pub add_seconds: Option<i64>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-enum LogType {
+pub enum LogType {
     Work,
     BreakStart,
-    BreakAdd
+    BreakAdd,
 }
