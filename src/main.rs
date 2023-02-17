@@ -1,12 +1,12 @@
 mod data {
-    pub mod tracking_week;
+    pub mod tracking_day;
 }
 mod window {
     pub mod time_tracker;
     pub mod widget;
 }
 
-use crate::data::tracking_week::TrackingWeek;
+use crate::data::tracking_day::TrackingDay;
 use crate::window::time_tracker::TimeTracker;
 use directories::ProjectDirs;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
@@ -27,7 +27,7 @@ fn main() {
 fn setup() -> Result<(), Box<dyn Error>> {
     let config_dir_path = setup_config_directory()?;
 
-    let read_result = TrackingWeek::from_file(config_dir_path.join("test.csv"))?;
+    let read_result = TrackingDay::from_file(config_dir_path.join("test.csv"))?;
     read_result.save()?;
 
     let window_options = setup_custom_options();
