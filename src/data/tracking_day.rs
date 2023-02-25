@@ -27,7 +27,7 @@ impl TrackingDay {
         })
     }
 
-    pub fn save_records(&mut self) -> Result<(), csv::Error> {
+    pub fn save_records(&self) -> Result<(), csv::Error> {
         let mut writer = Writer::from_path(&self.file_path)?;
 
         for record in &self.records {
@@ -75,6 +75,10 @@ impl TrackingDay {
 
     pub fn append_record(&mut self, log_record: LogRecord) {
         self.records.push(log_record);
+    }
+
+    pub fn get_today_working_time(&self) -> u32 {
+        27967
     }
 }
 

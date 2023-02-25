@@ -1,22 +1,21 @@
 mod data {
     pub mod tracking_day;
 }
+mod manager {
+    pub mod directory_manager;
+}
 mod window {
     pub mod time_tracker;
     pub mod widget;
 }
 
-use crate::data::tracking_day::{LogRecord, LogType, TrackingDay};
+use crate::data::tracking_day::TrackingDay;
+use crate::manager::directory_manager::DirectoryType;
 use crate::window::time_tracker::TimeTracker;
-use chrono::Local;
-use directories::ProjectDirs;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
-use std::env::current_dir;
 use std::error::Error;
-use std::fs::{create_dir_all, metadata};
-use std::path::PathBuf;
-use std::{io, process};
+use std::process;
 
 fn main() {
     if let Err(err) = setup() {
@@ -26,24 +25,19 @@ fn main() {
 }
 
 fn setup() -> Result<(), Box<dyn Error>> {
-    let config_dir_path = setup_config_directory()?;
-
-    let mut read_result = TrackingDay::from_file(config_dir_path.join("test.csv"))?;
-    // read_result.save_records()?;
-    read_result.append_save_record(LogRecord {
-        log_type: LogType::Work,
-        time: Local::now(),
-        add_seconds: None,
-    })?;
+    let _config_dir_path = DirectoryType::Config.setup_directory("de", "Achsion", "TimeTracker")?;
+    let data_dir_path = DirectoryType::Data.setup_directory("de", "Achsion", "TimeTracker")?;
 
     let window_options = setup_custom_options();
+
+    let tracking_day = TrackingDay::from_file(data_dir_path.join("test.csv"))?;
 
     run_native(
         "TimeTracker",
         window_options,
         Box::new(|cc| {
             setup_custom_fonts(&cc.egui_ctx);
-            Box::new(TimeTracker::new())
+            Box::new(TimeTracker::new(tracking_day))
         }),
     )?;
 
