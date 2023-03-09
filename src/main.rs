@@ -118,22 +118,3 @@ fn load_icon() -> IconData {
         height: icon_height,
     }
 }
-
-fn setup_config_directory() -> Result<PathBuf, io::Error> {
-    let config_path = if cfg!(debug_assertions) {
-        let mut working_dir = current_dir()?;
-        working_dir.push("timetracker-tmp");
-        working_dir
-    } else {
-        ProjectDirs::from("de", "Achsion", "TimeTracker")
-            .unwrap()
-            .config_dir()
-            .to_path_buf()
-    };
-
-    if metadata(&config_path).is_err() {
-        create_dir_all(&config_path)?;
-    }
-
-    Ok(config_path)
-}
