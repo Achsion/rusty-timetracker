@@ -83,6 +83,6 @@ impl App for TimeTracker {
     }
 
     fn auto_save_interval(&self) -> Duration {
-        Duration::from_secs(60)
+        Duration::from_secs(30)
     }
 }
