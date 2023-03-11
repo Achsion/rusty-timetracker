@@ -1,5 +1,5 @@
-use eframe::egui::{lerp, pos2, vec2, Response, Sense, Ui, Widget, WidgetInfo, WidgetType};
 use crate::window::time_tracker::TimeTracker;
+use eframe::egui::{lerp, pos2, vec2, Response, Sense, Ui, Widget, WidgetInfo, WidgetType};
 
 pub struct CustomWidget;
 

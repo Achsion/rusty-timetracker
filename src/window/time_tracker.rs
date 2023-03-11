@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use chrono::Local;
-use eframe::{App, Frame, Storage};
 use eframe::egui::{Align, CentralPanel, Context, Layout, Ui};
+use eframe::{App, Frame, Storage};
 
 use crate::data::tracking_day::{LogRecord, LogType, TrackingDay};
 use crate::window::widget::CustomWidget;
