@@ -10,8 +10,8 @@ rust-version = "1.67"
 
 [dependencies]
 chrono = { version = "0.4.23", features = ["serde"] }
-csv = "1.2.0"
+csv = "1.2.1"
 directories = "4.0.1"
-eframe = { version = "0.21.0", features = ["persistence"] }
+eframe = { version = "0.21.3", features = ["persistence"] }
 image = "0.24.5"
-serde = { version = "1.0.152", features = ["derive"] }
+serde = { version = "1.0.154", features = ["derive"] }
