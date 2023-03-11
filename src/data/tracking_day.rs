@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 use csv::{Reader, Writer, WriterBuilder};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
@@ -85,7 +85,7 @@ impl TrackingDay {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct LogRecord {
-    pub time: DateTime<Local>,
+    pub time: DateTime<Utc>,
     pub log_type: LogType,
     pub add_seconds: Option<i64>,
 }

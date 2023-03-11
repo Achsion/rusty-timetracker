@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use chrono::Local;
+use chrono::Utc;
 use eframe::egui::{Align, CentralPanel, Context, Layout, Ui};
 use eframe::{App, Frame, Storage};
 
@@ -63,7 +63,7 @@ impl TimeTracker {
             self.tracking_day
                 .append_save_record(LogRecord {
                     log_type: LogType::Work,
-                    time: Local::now(), //TODO: remove time zone
+                    time: Utc::now(),
                     add_seconds: None,
                 })
                 .expect("Could not save new log record!");
