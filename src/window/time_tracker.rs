@@ -10,13 +10,17 @@ use crate::window::widget::{CustomWidget, WithToggleSwitch};
 pub struct TimeTracker {
     pub is_active: bool,
     tracking_day: DayLog,
+    today_working_time: i64,
 }
 
 impl TimeTracker {
     pub fn new(tracking_day: DayLog) -> Self {
+        let today_working_time = tracking_day.get_today_working_seconds_sum();
+
         Self {
             is_active: true,
             tracking_day,
+            today_working_time,
         }
     }
 
@@ -33,10 +37,8 @@ impl TimeTracker {
     }
 
     fn render_section_today(&self, ui: &mut Ui) {
-        let working_time = self.tracking_day.get_today_working_seconds_sum();
-
-        let minutes = (working_time / 60) % 60;
-        let hours = (working_time / 60) / 60;
+        let minutes = (self.today_working_time / 60) % 60;
+        let hours = (self.today_working_time / 60) / 60;
 
         ui.horizontal(|ui| {
             ui.label("Working Time");
@@ -58,6 +60,8 @@ impl TimeTracker {
                 add_seconds: None,
             })
             .expect("Could not save new log record!");
+
+        self.update_working_time();
     }
 
     fn log_break_start(&mut self) {
@@ -68,6 +72,10 @@ impl TimeTracker {
                 add_seconds: None,
             })
             .expect("Could not save new log record!");
+    }
+
+    fn update_working_time(&mut self) {
+        self.today_working_time = self.tracking_day.get_today_working_seconds_sum();
     }
 }
 
