@@ -92,6 +92,18 @@ impl DayLog {
         self.records.push(log_record);
     }
 
+    fn calculate_work_seconds_diff(
+        &self,
+        last_time_opt: Option<DateTime<Utc>>,
+        newer_time: DateTime<Utc>,
+    ) -> i64 {
+        if let Some(last_time) = last_time_opt {
+            return newer_time.signed_duration_since(last_time).num_seconds();
+        }
+
+        0
+    }
+
     pub fn get_today_working_seconds_sum(&self) -> i64 {
         let today = Utc::now().day();
         let _check = self.records.get(0).unwrap().time.day();
@@ -103,28 +115,29 @@ impl DayLog {
             .filter(|r| r.time.day() == today)
             .for_each(|record| {
                 match record.log_type {
-                    LogType::Break => last_work_log_time = None,
                     LogType::BreakAdd => working_time_sum -= record.add_seconds.unwrap_or(0),
+                    LogType::Break => {
+                        working_time_sum +=
+                            self.calculate_work_seconds_diff(last_work_log_time, record.time);
+                        last_work_log_time = None;
+                    }
                     LogType::Work => {
-                        if let Some(last_time) = last_work_log_time {
-                            working_time_sum +=
-                                record.time.signed_duration_since(last_time).num_seconds();
-                        }
+                        working_time_sum +=
+                            self.calculate_work_seconds_diff(last_work_log_time, record.time);
                         last_work_log_time = Some(record.time);
                     }
                     _ => {}
                 };
             });
 
-        if let Some(last_time) = last_work_log_time {
-            working_time_sum += Utc::now().signed_duration_since(last_time).num_seconds();
-        }
+        working_time_sum += self.calculate_work_seconds_diff(last_work_log_time, Utc::now());
 
         working_time_sum
     }
 
     pub fn last_log(&self, type_filter: Vec<LogType>) -> Option<&LogRecord> {
-        self.records.iter()
+        self.records
+            .iter()
             .filter(|r| type_filter.is_empty() || type_filter.contains(&r.log_type))
             .max_by(|a, b| a.time.partial_cmp(&b.time).unwrap())
     }
