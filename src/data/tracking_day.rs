@@ -1,5 +1,6 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Datelike, Utc};
 use csv::{Reader, Writer, WriterBuilder};
+use grouping_by::GroupingBy;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs::{metadata, OpenOptions};
@@ -42,14 +43,27 @@ impl TrackingDay {
         self.records
             .sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
 
-        let mut last_log_type = LogType::Unknown;
         let mut new_records: Vec<LogRecord> = Vec::new();
-        for record in &self.records {
-            if record.log_type == LogType::BreakAdd || last_log_type != record.log_type {
-                new_records.push(*record);
-                last_log_type = record.log_type;
-            }
-        }
+
+        self.records
+            .iter()
+            .grouping_by(|r| r.time.day())
+            .iter()
+            .for_each(|(_, daily_records)| {
+                let mut last_log_type = LogType::Unknown;
+
+                for i in 0..daily_records.len() {
+                    let record = daily_records.get(i).unwrap();
+
+                    if i == daily_records.len()
+                        || record.log_type == LogType::BreakAdd
+                        || last_log_type != record.log_type
+                    {
+                        new_records.push(**record);
+                        last_log_type = record.log_type;
+                    }
+                }
+            });
 
         self.records = new_records;
     }

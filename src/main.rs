@@ -30,7 +30,9 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
     let window_options = setup_custom_options();
 
-    let tracking_day = TrackingDay::from_file(data_dir_path.join("test.csv"))?;
+    let mut tracking_day = TrackingDay::from_file(data_dir_path.join("test.csv"))?;
+    tracking_day.clean_records();
+    tracking_day.save_records()?;
 
     run_native(
         "TimeTracker",
