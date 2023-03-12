@@ -4,16 +4,16 @@ use chrono::Utc;
 use eframe::egui::{Align, CentralPanel, Context, Layout, Ui};
 use eframe::{App, Frame, Storage};
 
-use crate::data::tracking_day::{LogRecord, LogType, TrackingDay};
+use crate::data::day_log::{DayLog, LogRecord, LogType};
 use crate::window::widget::{CustomWidget, WithToggleSwitch};
 
 pub struct TimeTracker {
     pub is_active: bool,
-    tracking_day: TrackingDay,
+    tracking_day: DayLog,
 }
 
 impl TimeTracker {
-    pub fn new(tracking_day: TrackingDay) -> Self {
+    pub fn new(tracking_day: DayLog) -> Self {
         Self {
             is_active: true,
             tracking_day,
@@ -33,7 +33,7 @@ impl TimeTracker {
     }
 
     fn render_section_today(&self, ui: &mut Ui) {
-        let working_time = self.tracking_day.get_today_working_time();
+        let working_time = self.tracking_day.get_today_working_seconds_sum();
 
         let minutes = (working_time / 60) % 60;
         let hours = (working_time / 60) / 60;

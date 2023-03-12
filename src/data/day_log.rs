@@ -6,12 +6,12 @@ use std::error::Error;
 use std::fs::{metadata, OpenOptions};
 use std::path::PathBuf;
 
-pub struct TrackingDay {
+pub struct DayLog {
     file_path: PathBuf,
     records: Vec<LogRecord>,
 }
 
-impl TrackingDay {
+impl DayLog {
     pub fn from_file(file_path: PathBuf) -> Result<Self, csv::Error> {
         if metadata(&file_path).is_err() {
             return Ok(Self {
@@ -45,6 +45,7 @@ impl TrackingDay {
 
         let mut new_records: Vec<LogRecord> = Vec::new();
 
+        //TODO: sort out records older than today and persist them to the overall working stats
         self.records
             .iter()
             .grouping_by(|r| r.time.day())
@@ -91,8 +92,35 @@ impl TrackingDay {
         self.records.push(log_record);
     }
 
-    pub fn get_today_working_time(&self) -> u32 {
-        27967
+    pub fn get_today_working_seconds_sum(&self) -> i64 {
+        let today = (Utc::now()).day();
+        let _check = self.records.get(0).unwrap().time.day();
+        let mut working_time_sum: i64 = 0;
+        let mut last_work_log_time: Option<DateTime<Utc>> = None;
+
+        self.records
+            .iter()
+            .filter(|r| r.time.day() == today)
+            .for_each(|record| {
+                match record.log_type {
+                    LogType::BreakStart => last_work_log_time = None,
+                    LogType::BreakAdd => working_time_sum -= record.add_seconds.unwrap_or(0),
+                    LogType::Work => {
+                        if let Some(last_time) = last_work_log_time {
+                            working_time_sum +=
+                                record.time.signed_duration_since(last_time).num_seconds();
+                        }
+                        last_work_log_time = Some(record.time);
+                    }
+                    _ => {}
+                };
+            });
+
+        if let Some(last_time) = last_work_log_time {
+            working_time_sum += Utc::now().signed_duration_since(last_time).num_seconds();
+        }
+
+        working_time_sum
     }
 }
 

@@ -13,11 +13,14 @@ impl CustomWidget {
         if response.clicked() {
             on.on_tracker_state_change();
         }
-        response.widget_info(|| WidgetInfo::selected(WidgetType::Checkbox, on.get_toggle_state(), ""));
+        response
+            .widget_info(|| WidgetInfo::selected(WidgetType::Checkbox, on.get_toggle_state(), ""));
 
         if ui.is_rect_visible(rect) {
             let how_on = ui.ctx().animate_bool(response.id, on.get_toggle_state());
-            let visuals = ui.style().interact_selectable(&response, on.get_toggle_state());
+            let visuals = ui
+                .style()
+                .interact_selectable(&response, on.get_toggle_state());
             let rect = rect.expand(visuals.expansion);
             let radius = 0.5 * rect.height();
             ui.painter()

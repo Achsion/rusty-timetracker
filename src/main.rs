@@ -1,5 +1,5 @@
 mod data {
-    pub mod tracking_day;
+    pub mod day_log;
 }
 mod manager {
     pub mod directory_manager;
@@ -9,7 +9,7 @@ mod window {
     pub mod widget;
 }
 
-use crate::data::tracking_day::TrackingDay;
+use crate::data::day_log::DayLog;
 use crate::manager::directory_manager::DirectoryType;
 use crate::window::time_tracker::TimeTracker;
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
@@ -30,7 +30,9 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
     let window_options = setup_custom_options();
 
-    let mut tracking_day = TrackingDay::from_file(data_dir_path.join("day_log.csv"))?;
+    //TODO: start work log by starting the application
+
+    let mut tracking_day = DayLog::from_file(data_dir_path.join("day_log.csv"))?;
     //TODO: check if significant time is between last log and now (start) -> dont log as work but maybe insert a break instead
     tracking_day.clean_records();
     tracking_day.save_records()?;
