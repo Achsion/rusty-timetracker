@@ -55,14 +55,26 @@ impl TimeTracker {
         self.is_active = !self.is_active;
         if self.is_active {
             self.log_work();
+        } else {
+            self.log_break_start();
         }
     }
 
     fn log_work(&mut self) {
+        self.tracking_day
+            .append_save_record(LogRecord {
+                log_type: LogType::Work,
+                time: Utc::now(),
+                add_seconds: None,
+            })
+            .expect("Could not save new log record!");
+    }
+
+    fn log_break_start(&mut self) {
         if self.is_active {
             self.tracking_day
                 .append_save_record(LogRecord {
-                    log_type: LogType::Work,
+                    log_type: LogType::BreakStart,
                     time: Utc::now(),
                     add_seconds: None,
                 })
@@ -79,7 +91,9 @@ impl App for TimeTracker {
     }
 
     fn save(&mut self, _storage: &mut dyn Storage) {
-        self.log_work();
+        if self.is_active {
+            self.log_work();
+        }
     }
 
     fn auto_save_interval(&self) -> Duration {
