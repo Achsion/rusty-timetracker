@@ -9,12 +9,14 @@ mod window {
     pub mod widget;
 }
 
-use crate::data::day_log::DayLog;
+use crate::data::day_log::{DayLog, LogRecord, LogType};
 use crate::manager::directory_manager::DirectoryType;
 use crate::window::time_tracker::TimeTracker;
+use chrono::{Datelike, Duration, Utc};
 use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
 use eframe::{run_native, IconData, NativeOptions};
 use std::error::Error;
+use std::ops::Add;
 use std::process;
 
 fn main() {
@@ -32,14 +34,33 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
     let mut tracking_day = DayLog::from_file(data_dir_path.join("day_log.csv"))?;
 
-    //TODO: check if significant time is between last log and now (start) -> dont log as work but maybe insert a break instead
     tracking_day.clean_records();
+
+    let last_log_optional = tracking_day.last_log(vec![LogType::Work, LogType::Break]);
+    if let Some(last_log) = last_log_optional {
+        let now = Utc::now();
+        if last_log.log_type == LogType::Work
+            && last_log.time.day() == now.day()
+            && now
+                .signed_duration_since(last_log.time)
+                .gt(&Duration::minutes(30))
+        {
+            tracking_day.append_record(LogRecord {
+                time: last_log.time.add(Duration::minutes(1)),
+                log_type: LogType::Break,
+                add_seconds: None,
+            });
+        }
+    }
+
     tracking_day.save_records()?;
 
     let mut time_tracker = TimeTracker::new(tracking_day);
     if time_tracker.is_active {
-        time_tracker.log_work();
+        time_tracker.log_work_now();
     }
+
+    time_tracker.update_working_time();
 
     run_native(
         "TimeTracker",

@@ -9,7 +9,7 @@ use crate::window::widget::{CustomWidget, WithToggleSwitch};
 
 pub struct TimeTracker {
     pub is_active: bool,
-    tracking_day: DayLog,
+    pub tracking_day: DayLog,
     today_working_time: i64,
 }
 
@@ -51,7 +51,7 @@ impl TimeTracker {
         todo!()
     }
 
-    pub fn log_work(&mut self) {
+    pub fn log_work_now(&mut self) {
         self.tracking_day
             .append_save_record(LogRecord {
                 log_type: LogType::Work,
@@ -66,14 +66,14 @@ impl TimeTracker {
     fn log_break_start(&mut self) {
         self.tracking_day
             .append_save_record(LogRecord {
-                log_type: LogType::BreakStart,
+                log_type: LogType::Break,
                 time: Utc::now(),
                 add_seconds: None,
             })
             .expect("Could not save new log record!");
     }
 
-    fn update_working_time(&mut self) {
+    pub fn update_working_time(&mut self) {
         self.today_working_time = self.tracking_day.get_today_working_seconds_sum();
     }
 }
@@ -87,7 +87,7 @@ impl App for TimeTracker {
 
     fn save(&mut self, _storage: &mut dyn Storage) {
         if self.is_active {
-            self.log_work();
+            self.log_work_now();
         }
     }
 
@@ -100,7 +100,7 @@ impl WithToggleSwitch for TimeTracker {
     fn on_tracker_state_change(&mut self) {
         self.is_active = !self.is_active;
         if self.is_active {
-            self.log_work();
+            self.log_work_now();
         } else {
             self.log_break_start();
         }

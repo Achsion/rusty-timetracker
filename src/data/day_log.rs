@@ -56,7 +56,7 @@ impl DayLog {
                 for i in 0..daily_records.len() {
                     let record = daily_records.get(i).unwrap();
 
-                    if i == daily_records.len()
+                    if i == daily_records.len() - 1
                         || record.log_type == LogType::BreakAdd
                         || last_log_type != record.log_type
                     {
@@ -93,7 +93,7 @@ impl DayLog {
     }
 
     pub fn get_today_working_seconds_sum(&self) -> i64 {
-        let today = (Utc::now()).day();
+        let today = Utc::now().day();
         let _check = self.records.get(0).unwrap().time.day();
         let mut working_time_sum: i64 = 0;
         let mut last_work_log_time: Option<DateTime<Utc>> = None;
@@ -103,7 +103,7 @@ impl DayLog {
             .filter(|r| r.time.day() == today)
             .for_each(|record| {
                 match record.log_type {
-                    LogType::BreakStart => last_work_log_time = None,
+                    LogType::Break => last_work_log_time = None,
                     LogType::BreakAdd => working_time_sum -= record.add_seconds.unwrap_or(0),
                     LogType::Work => {
                         if let Some(last_time) = last_work_log_time {
@@ -122,6 +122,12 @@ impl DayLog {
 
         working_time_sum
     }
+
+    pub fn last_log(&self, type_filter: Vec<LogType>) -> Option<&LogRecord> {
+        self.records.iter()
+            .filter(|r| type_filter.is_empty() || type_filter.contains(&r.log_type))
+            .max_by(|a, b| a.time.partial_cmp(&b.time).unwrap())
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -135,7 +141,7 @@ pub struct LogRecord {
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum LogType {
     Work,
-    BreakStart,
+    Break,
     BreakAdd,
     Unknown,
 }
