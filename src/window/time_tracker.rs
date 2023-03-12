@@ -5,7 +5,7 @@ use eframe::egui::{Align, CentralPanel, Context, Layout, Ui};
 use eframe::{App, Frame, Storage};
 
 use crate::data::tracking_day::{LogRecord, LogType, TrackingDay};
-use crate::window::widget::CustomWidget;
+use crate::window::widget::{CustomWidget, WithToggleSwitch};
 
 pub struct TimeTracker {
     pub is_active: bool,
@@ -50,16 +50,6 @@ impl TimeTracker {
         todo!()
     }
 
-    //TODO: add more state events, also put this in some kind of trait
-    pub fn on_tracker_state_change(&mut self) {
-        self.is_active = !self.is_active;
-        if self.is_active {
-            self.log_work();
-        } else {
-            self.log_break_start();
-        }
-    }
-
     fn log_work(&mut self) {
         self.tracking_day
             .append_save_record(LogRecord {
@@ -96,5 +86,20 @@ impl App for TimeTracker {
 
     fn auto_save_interval(&self) -> Duration {
         Duration::from_secs(30)
+    }
+}
+
+impl WithToggleSwitch for TimeTracker {
+    fn on_tracker_state_change(&mut self) {
+        self.is_active = !self.is_active;
+        if self.is_active {
+            self.log_work();
+        } else {
+            self.log_break_start();
+        }
+    }
+
+    fn get_toggle_state(&self) -> bool {
+        self.is_active
     }
 }

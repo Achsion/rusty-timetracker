@@ -30,7 +30,7 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
     let window_options = setup_custom_options();
 
-    let mut tracking_day = TrackingDay::from_file(data_dir_path.join("test.csv"))?;
+    let mut tracking_day = TrackingDay::from_file(data_dir_path.join("day_log.csv"))?;
     //TODO: check if significant time is between last log and now (start) -> dont log as work but maybe insert a break instead
     tracking_day.clean_records();
     tracking_day.save_records()?;
