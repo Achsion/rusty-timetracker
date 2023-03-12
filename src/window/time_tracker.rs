@@ -71,15 +71,13 @@ impl TimeTracker {
     }
 
     fn log_break_start(&mut self) {
-        if self.is_active {
-            self.tracking_day
-                .append_save_record(LogRecord {
-                    log_type: LogType::BreakStart,
-                    time: Utc::now(),
-                    add_seconds: None,
-                })
-                .expect("Could not save new log record!");
-        }
+        self.tracking_day
+            .append_save_record(LogRecord {
+                log_type: LogType::BreakStart,
+                time: Utc::now(),
+                add_seconds: None,
+            })
+            .expect("Could not save new log record!");
     }
 }
 
