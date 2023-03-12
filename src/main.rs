@@ -30,19 +30,23 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
     let window_options = setup_custom_options();
 
-    //TODO: start work log by starting the application
-
     let mut tracking_day = DayLog::from_file(data_dir_path.join("day_log.csv"))?;
+
     //TODO: check if significant time is between last log and now (start) -> dont log as work but maybe insert a break instead
     tracking_day.clean_records();
     tracking_day.save_records()?;
+
+    let mut time_tracker = TimeTracker::new(tracking_day);
+    if time_tracker.is_active {
+        time_tracker.log_work();
+    }
 
     run_native(
         "TimeTracker",
         window_options,
         Box::new(|cc| {
             setup_custom_fonts(&cc.egui_ctx);
-            Box::new(TimeTracker::new(tracking_day))
+            Box::new(time_tracker)
         }),
     )?;
 

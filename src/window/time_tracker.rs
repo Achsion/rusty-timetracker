@@ -28,7 +28,6 @@ impl TimeTracker {
         ui.horizontal(|ui| {
             ui.heading("Today");
             ui.with_layout(Layout::top_down(Align::RIGHT), |ui| {
-                // ui.add(CustomWidget::toggle_switch(&mut self.is_active))
                 ui.add(CustomWidget::toggle_switch(self))
             });
         });
@@ -52,7 +51,7 @@ impl TimeTracker {
         todo!()
     }
 
-    fn log_work(&mut self) {
+    pub fn log_work(&mut self) {
         self.tracking_day
             .append_save_record(LogRecord {
                 log_type: LogType::Work,
