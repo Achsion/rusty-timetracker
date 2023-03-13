@@ -106,7 +106,6 @@ impl DayLog {
 
     pub fn get_today_working_seconds_sum(&self) -> i64 {
         let today = Utc::now().day();
-        let _check = self.records.get(0).unwrap().time.day();
         let mut working_time_sum: i64 = 0;
         let mut last_work_log_time: Option<DateTime<Utc>> = None;
 
