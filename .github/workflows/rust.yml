@@ -18,3 +18,8 @@ jobs:
       uses: taiki-e/setup-cross-toolchain-action@v1
       with:
         target: aarch64-unknown-linux-gnu
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: timetracker
+        path: ./target/aarch64-unknown-linux-gnu/release/timetracker
