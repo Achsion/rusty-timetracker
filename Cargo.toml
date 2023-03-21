@@ -1,5 +1,5 @@
 [package]
-name = "timetracker"
+name = "rusty-timetracker"
 description = "Simple time tracking for work hours"
 version = "0.1.0"
 authors = ["Achsion"]

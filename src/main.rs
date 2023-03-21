@@ -27,8 +27,8 @@ fn main() {
 }
 
 fn setup() -> Result<(), Box<dyn Error>> {
-    let _config_dir_path = DirectoryType::Config.setup_directory("de", "Achsion", "TimeTracker")?;
-    let data_dir_path = DirectoryType::Data.setup_directory("de", "Achsion", "TimeTracker")?;
+    let _config_dir_path = DirectoryType::Config.setup_directory("de", "Achsion", "RustyTimeTracker")?;
+    let data_dir_path = DirectoryType::Data.setup_directory("de", "Achsion", "RustyTimeTracker")?;
 
     let window_options = setup_custom_options();
 
