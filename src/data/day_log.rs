@@ -105,13 +105,13 @@ impl DayLog {
     }
 
     pub fn get_today_working_seconds_sum(&self) -> i64 {
-        let today = Utc::now().day();
+        let today = Utc::now().num_days_from_ce();
         let mut working_time_sum: i64 = 0;
         let mut last_work_log_time: Option<DateTime<Utc>> = None;
 
         self.records
             .iter()
-            .filter(|r| r.time.day() == today)
+            .filter(|r| r.time.num_days_from_ce() == today)
             .for_each(|record| {
                 match record.log_type {
                     LogType::BreakAdd => {
