@@ -1,3 +1,17 @@
+use std::error::Error;
+use std::ops::Add;
+use std::process;
+
+use chrono::{Datelike, Duration, Utc};
+use eframe::egui::{
+    Context, FontData, FontDefinitions, FontFamily, FontId, IconData, TextStyle, ViewportBuilder,
+};
+use eframe::{run_native, NativeOptions};
+
+use crate::data::day_log::{DayLog, LogRecord, LogType};
+use crate::manager::directory_manager::DirectoryType;
+use crate::window::time_tracker::TimeTracker;
+
 mod data {
     pub mod day_log;
 }
@@ -8,16 +22,6 @@ mod window {
     pub mod time_tracker;
     pub mod widget;
 }
-
-use crate::data::day_log::{DayLog, LogRecord, LogType};
-use crate::manager::directory_manager::DirectoryType;
-use crate::window::time_tracker::TimeTracker;
-use chrono::{Datelike, Duration, Utc};
-use eframe::egui::{Context, FontData, FontDefinitions, FontFamily, FontId, TextStyle, Vec2};
-use eframe::{run_native, IconData, NativeOptions};
-use std::error::Error;
-use std::ops::Add;
-use std::process;
 
 fn main() {
     if let Err(err) = setup() {
@@ -77,9 +81,10 @@ fn setup() -> Result<(), Box<dyn Error>> {
 
 fn setup_custom_options() -> NativeOptions {
     NativeOptions {
-        icon_data: Some(load_icon()),
-        initial_window_size: Some(Vec2::new(300., 400.)),
-        resizable: false,
+        viewport: ViewportBuilder::default()
+            .with_icon(load_icon())
+            .with_inner_size([300., 400.])
+            .with_resizable(false),
         ..Default::default()
     }
 }
