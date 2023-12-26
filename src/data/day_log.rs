@@ -114,7 +114,11 @@ impl DayLog {
             .filter(|r| r.time.day() == today)
             .for_each(|record| {
                 match record.log_type {
-                    LogType::BreakAdd => working_time_sum -= record.add_seconds.unwrap_or(0),
+                    LogType::BreakAdd => {
+                        if let Some(add_seconds) = record.add_seconds {
+                            working_time_sum -= add_seconds;
+                        }
+                    },
                     LogType::Break => {
                         working_time_sum +=
                             self.calculate_work_seconds_diff(last_work_log_time, record.time);
