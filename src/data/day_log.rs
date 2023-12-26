@@ -118,7 +118,7 @@ impl DayLog {
                         if let Some(add_seconds) = record.add_seconds {
                             working_time_sum -= add_seconds;
                         }
-                    },
+                    }
                     LogType::Break => {
                         working_time_sum +=
                             self.calculate_work_seconds_diff(last_work_log_time, record.time);
