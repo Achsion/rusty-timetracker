@@ -13,11 +13,10 @@ jobs:
       matrix:
         platform:
           - release_for: Linux-x86_64
-            os: ubuntu-20.04
+            os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             bin: rusty-timetracker
             name: rusty-timetracker-Linux-x86_64
-
           - release_for: Windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
@@ -26,18 +25,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build binary
-        uses: houseabsolute/actions-rust-cross@v0
+      - name: Compile and release
+        uses: rust-build/rust-build.action@v1.4.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          command: ${{ matrix.platform.command }}
-          target: ${{ matrix.platform.target }}
-          args: "--release"
-          strip: true
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.platform.name }}
-          path: target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+          RUSTTARGET: ${{ matrix.target }}
+          EXTRA_FILES: "README.md LICENSE"
 #      - name: Publish GitHub release
 #        uses: softprops/action-gh-release@v1
 #        with:
