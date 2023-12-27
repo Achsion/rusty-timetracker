@@ -3,20 +3,17 @@ use std::ops::Add;
 use std::process;
 
 use chrono::{Datelike, Duration, Utc};
+use directory_manager::DirectoryType;
 use eframe::egui::{
     Context, FontData, FontDefinitions, FontFamily, FontId, IconData, TextStyle, ViewportBuilder,
 };
 use eframe::{run_native, NativeOptions};
 
 use crate::data::day_log::{DayLog, LogRecord, LogType};
-use crate::manager::directory_manager::DirectoryType;
 use crate::window::time_tracker::TimeTracker;
 
 mod data {
     pub mod day_log;
-}
-mod manager {
-    pub mod directory_manager;
 }
 mod window {
     pub mod time_tracker;
@@ -31,8 +28,7 @@ fn main() {
 }
 
 fn setup() -> Result<(), Box<dyn Error>> {
-    let _config_dir_path =
-        DirectoryType::Config.setup_directory("de", "Achsion", "RustyTimeTracker")?;
+    let _config_dir_path = DirectoryType::Config.setup_directory("de", "Achsion", "RustyTimeTracker")?;
     let data_dir_path = DirectoryType::Data.setup_directory("de", "Achsion", "RustyTimeTracker")?;
 
     let window_options = setup_custom_options();
