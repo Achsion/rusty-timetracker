@@ -13,30 +13,36 @@ jobs:
       matrix:
         platform:
           - release_for: Linux-x86_64
-            target: x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-gnu
             bin: rusty-timetracker
             name: rusty-timetracker-Linux-x86_64
           - release_for: Windows-x86_64
             target: x86_64-pc-windows-gnu
             bin: rusty-timetracker.exe
             name: rusty-timetracker-Windows-x86_64.exe
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Compile
-        id: compile
-        uses: rust-build/rust-build.action@v1.4.4
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          EXTRA_FILES: "README.md LICENSE"
-          UPLOAD_MODE: none
-      - name: Upload artifact
+          toolchain: stable
+      - name: Install dependencies
+        run: |
+          rustup target add ${{ matrix.target }}
+      - name: Compile for ${{ matrix.release_for }}
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target=${{ matrix.target }} --release --all-features --target-dir=/tmp
+      - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Binary
+          name: ${{ matrix.platform.name }}
           path: |
-            ${{ steps.compile.outputs.BUILT_ARCHIVE }}
-            ${{ steps.compile.outputs.BUILT_CHECKSUM }}
+            /tmp/target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
 #      - name: Publish GitHub release
 #        uses: softprops/action-gh-release@v1
 #        with:
