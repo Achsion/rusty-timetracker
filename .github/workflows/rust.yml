@@ -17,19 +17,26 @@ jobs:
             bin: rusty-timetracker
             name: rusty-timetracker-Linux-x86_64
           - release_for: Windows-x86_64
-            target: x86_64-pc-windows-msvc
+            target: x86_64-pc-windows-gnu
             bin: rusty-timetracker.exe
             name: rusty-timetracker-Windows-x86_64.exe
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Compile and release
+      - name: Compile
+        id: compile
         uses: rust-build/rust-build.action@v1.4.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           RUSTTARGET: ${{ matrix.target }}
           EXTRA_FILES: "README.md LICENSE"
+          UPLOAD_MODE: none
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Binary
+          path: |
+            ${{ steps.compile.outputs.BUILT_ARCHIVE }}
+            ${{ steps.compile.outputs.BUILT_CHECKSUM }}
 #      - name: Publish GitHub release
 #        uses: softprops/action-gh-release@v1
 #        with:
