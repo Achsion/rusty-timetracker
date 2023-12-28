@@ -20,22 +20,15 @@ jobs:
             target: x86_64-pc-windows-gnu
             bin: rusty-timetracker.exe
             name: rusty-timetracker-Windows-x86_64.exe
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
       - name: Install dependencies
         run: rustup target add ${{ matrix.platform.target }}
       - name: Compile for ${{ matrix.platform.release_for }}
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --target=${{ matrix.platform.target }} --release --all-features
+        run: cargo build --target=${{ matrix.platform.target }} --release --all-features
       - name: Upload ${{ matrix.platform.release_for }} artifacts
         uses: actions/upload-artifact@v3
         with:
