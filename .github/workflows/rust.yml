@@ -13,7 +13,7 @@ jobs:
       matrix:
         platform:
           - release_for: Linux-x86_64
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
             bin: rusty-timetracker
             name: rusty-timetracker-Linux-x86_64
           - release_for: Windows-x86_64
