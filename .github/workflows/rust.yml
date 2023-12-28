@@ -35,11 +35,13 @@ jobs:
           RUSTTARGET: ${{ matrix.platform.target }}
           EXTRA_FILES: "README.md LICENSE"
           UPLOAD_MODE: none
-      - name: Upload ${{ matrix.platform.release_for }} artifacts
+      - name: Upload ${{ matrix.platform.release_for }} artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.platform.name }}
-          path: ./target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+          name: Binary
+          path: |
+            ${{ steps.compile.outputs.BUILT_ARCHIVE }}
+            ${{ steps.compile.outputs.BUILT_CHECKSUM }}
 #      - name: Publish GitHub release
 #        uses: softprops/action-gh-release@v1
 #        with:
