@@ -57,7 +57,7 @@ impl TimeTracker {
         let hours = (week_working_time_sum / 60) / 60;
 
         ui.horizontal(|ui| {
-            ui.label("Weekly Working Time");
+            ui.label("Weekly Time");
             ui.with_layout(Layout::top_down(Align::RIGHT), |ui| {
                 ui.label(format!("{hours:0>2}:{minutes:0>2}"))
             });
