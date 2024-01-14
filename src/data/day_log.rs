@@ -142,36 +142,42 @@ impl DayLog {
         // TODO: this is only a temporary solution to display the weekly working time
         //       this exists solely because i am too lazy rn to implement a proper week_log data type thingy but i still want to see the time
 
+        let today = Utc::now().num_days_from_ce();
         let current_week = Utc::now().iso_week();
         let mut working_time_sum: i64 = 0;
         let mut last_work_log_time: Option<DateTime<Utc>> = None;
 
         self.records
             .iter()
-            .filter(|r| r.time.iso_week().eq(&current_week)) //TODO: divide/map per day and calculate accordingly
-            .for_each(|record| {
-                //TODO: i know that this IS a duplicate code BUT hear me out: this will be removed after the data change so i dont really care
-                match record.log_type {
-                    LogType::BreakAdd => {
-                        if let Some(add_seconds) = record.add_seconds {
-                            working_time_sum -= add_seconds;
-                        }
-                    }
-                    LogType::Break => {
-                        working_time_sum +=
-                            self.calculate_work_seconds_diff(last_work_log_time, record.time);
-                        last_work_log_time = None;
-                    }
-                    LogType::Work => {
-                        working_time_sum +=
-                            self.calculate_work_seconds_diff(last_work_log_time, record.time);
-                        last_work_log_time = Some(record.time);
-                    }
-                    _ => {}
-                };
+            .filter(|r| r.time.num_days_from_ce() != today)
+            .filter(|r| r.time.iso_week().eq(&current_week))
+            .grouping_by(|r| r.time.num_days_from_ce())
+            .iter()
+            .for_each(|(_, daily_record_list)| {
+                last_work_log_time = None;
+                daily_record_list.iter()
+                    .for_each(|record| {
+                        //TODO: i know that this IS a duplicate code BUT hear me out: this will be removed after the data change so i dont really care
+                        match record.log_type {
+                            LogType::BreakAdd => {
+                                if let Some(add_seconds) = record.add_seconds {
+                                    working_time_sum -= add_seconds;
+                                }
+                            }
+                            LogType::Break => {
+                                working_time_sum +=
+                                    self.calculate_work_seconds_diff(last_work_log_time, record.time);
+                                last_work_log_time = None;
+                            }
+                            LogType::Work => {
+                                working_time_sum +=
+                                    self.calculate_work_seconds_diff(last_work_log_time, record.time);
+                                last_work_log_time = Some(record.time);
+                            }
+                            _ => {}
+                        };
+                    });
             });
-
-        working_time_sum += self.calculate_work_seconds_diff(last_work_log_time, Utc::now());
 
         working_time_sum
     }
