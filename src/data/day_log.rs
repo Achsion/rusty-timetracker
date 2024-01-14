@@ -138,6 +138,8 @@ impl DayLog {
         working_time_sum
     }
 
+    // this only works due to the data structure having all past days too bundled all together in the day_log
+    // TODO: remove this after having a proper week (well or per-day) data
     pub fn tmp_get_week_working_seconds_without_today_sum(&self) -> i64 {
         // TODO: this is only a temporary solution to display the weekly working time
         //       this exists solely because i am too lazy rn to implement a proper week_log data type thingy but i still want to see the time
