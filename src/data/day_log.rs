@@ -148,7 +148,7 @@ impl DayLog {
 
         self.records
             .iter()
-            .filter(|r| r.time.iso_week().eq(&current_week))
+            .filter(|r| r.time.iso_week().eq(&current_week)) //TODO: divide/map per day and calculate accordingly
             .for_each(|record| {
                 //TODO: i know that this IS a duplicate code BUT hear me out: this will be removed after the data change so i dont really care
                 match record.log_type {
