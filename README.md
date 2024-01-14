@@ -24,6 +24,7 @@ Purpose of this tool is to have a peace of its own mind over his own working tim
 
 ## Future plans
 
+- [ ] Adding pictures to this README
 - [ ] Adding a forgotten break over the UI
 - [ ] Splitting the logged time data in more convenient structures:
   - [ ] Having a separate log file, with each day as its own entry
