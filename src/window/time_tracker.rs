@@ -11,16 +11,19 @@ pub struct TimeTracker {
     pub is_active: bool,
     pub tracking_day: DayLog,
     today_working_time: i64,
+    week_working_time: i64,
 }
 
 impl TimeTracker {
     pub fn new(tracking_day: DayLog) -> Self {
         let today_working_time = tracking_day.get_today_working_seconds_sum();
+        let week_working_time = tracking_day.tmp_get_week_working_seconds_without_today_sum();
 
         Self {
             is_active: true,
             tracking_day,
             today_working_time,
+            week_working_time,
         }
     }
 
@@ -33,6 +36,7 @@ impl TimeTracker {
         });
 
         self.render_section_today(ui);
+        self.render_section_week(ui);
     }
 
     fn render_section_today(&self, ui: &mut Ui) {
@@ -47,8 +51,17 @@ impl TimeTracker {
         });
     }
 
-    fn _render_section_week(&self, _ui: &mut Ui) {
-        todo!()
+    fn render_section_week(&self, ui: &mut Ui) {
+        let week_working_time_sum = self.today_working_time + self.week_working_time;
+        let minutes = (week_working_time_sum / 60) % 60;
+        let hours = (week_working_time_sum / 60) / 60;
+
+        ui.horizontal(|ui| {
+            ui.label("Weekly Working Time");
+            ui.with_layout(Layout::top_down(Align::RIGHT), |ui| {
+                ui.label(format!("{hours:0>2}:{minutes:0>2}"))
+            });
+        });
     }
 
     pub fn log_work_now(&mut self) {
