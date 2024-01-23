@@ -73,4 +73,5 @@ fabric.properties
 ### Project template
 tmp/
 timetracker-tmp/
+tmp-config/
 tmp-data/
